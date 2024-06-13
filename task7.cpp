@@ -1,80 +1,40 @@
-#include <iostream>
-#include <string>
+#include<iostream>
+#include<cstring>
 using namespace std;
 
-int skip[1024];
-
-void make_skip(const string& pat) {
-    int m = pat.size();
-    int pp = 0;
-    skip[0] = 0;
-    for (int pt = 1; pt < m; pt++) {
-        if (pat[pt] == pat[pp]) {
-            pp++;
-            skip[pt] = pp;
-        }
-        else {
-            if (pp != 0) {
-                pp = skip[pp - 1];
-                pt--;
-            }
-            else {
-                skip[pt] = 0;
-            }
-        }
-    }
-}
-
-int kmp(const string& txt, const string& pat) {
-    int n = txt.size();
-    int m = pat.size();
-    int pt = 0;
-    int pp = 0;
-
-    while (pt < n) {
-        cout << "txt: " << txt.substr(0, pt + 1) << endl;
-        cout << "pat: " << pat.substr(0, pp + 1) << endl;
-
-        if (txt[pt] == pat[pp]) {
-            pt++;
-            pp++;
-        }
-
-        if (pp == m) {
-            return pt - pp;
-        }
-        else if (pt < n && txt[pt] != pat[pp]) {
-            if (pp != 0) {
-                pp = skip[pp - 1];
-            }
-            else {
-                pt++;
-            }
-        }
-    }
-
-    return -1;
+int bf_match(const char* txt, const char* pat) {
+	int pt = 0;
+	int pp = 0;
+	int count = 0;
+	while (txt[pt] != '\0' && pat[pp] != '\0') {
+		if (txt[pt] == pat[pp]) {
+			pt++; pp++;
+		}
+		else {
+			pt = pt - pp + 1;
+			pp = 0;
+		}
+		/*if (pp == strlen(pat)) { 
+			count++; pp = 0;
+		}*/
+	}
+	//return count;
+	if (pp == strlen(pat)) return pt - pp;
+	else return -1;
 }
 
 int main() {
-    string txt, pat;
+	char text[256];
+	char pattern[256];
+	int idx;
 
-    cin >> txt;
-    cin >> pat;
-
-    make_skip(pat);
-    for (int i = 0; i < pat.size()-1; i++) {
-        cout << skip[i] << " ";
-    }
-    cout << endl;
-
-    int pos = kmp(txt, pat);
-    if (pos != -1) {
-        cout << pos <<  endl;
-    }
-    else {
-        cout << "패턴을 찾을 수 없습니다." << endl;
-    }
-
-    return 0;
+	cout << "input text: ";
+	cin >> text;
+	cout << "input pattern: ";
+	cin >> pattern;
+	idx = bf_match(text, pattern);
+	if (idx == -1) cout << "텍스트에 패턴이 없음" << endl;
+	else cout << "인덱스에 패턴이 있음 -> " << idx << endl;
+//	else cout << "인덱스에 있는 패턴 개수 -> " << idx << endl;
+	return 0;
 }
